@@ -23,17 +23,17 @@ from .control import ControlSender
 
 class Client:
     def __init__(
-        self,
-        device: Optional[Union[AdbDevice, str, any]] = None,
-        max_width: int = 0,
-        bitrate: int = 8000000,
-        max_fps: int = 0,
-        flip: bool = False,
-        block_frame: bool = False,
-        stay_awake: bool = False,
-        lock_screen_orientation: int = LOCK_SCREEN_ORIENTATION_UNLOCKED,
-        connection_timeout: int = 3000,
-        encoder_name: Optional[str] = None,
+            self,
+            device: Optional[Union[AdbDevice, str, any]] = None,
+            max_width: int = 0,
+            bitrate: int = 8000000,
+            max_fps: int = 0,
+            flip: bool = False,
+            block_frame: bool = False,
+            stay_awake: bool = False,
+            lock_screen_orientation: int = LOCK_SCREEN_ORIENTATION_UNLOCKED,
+            connection_timeout: int = 3000,
+            encoder_name: Optional[str] = None,
     ):
         """
         Create a scrcpy client, this client won't be started until you call the start function
@@ -55,10 +55,10 @@ class Client:
         assert bitrate >= 0, "bitrate must be greater than or equal to 0"
         assert max_fps >= 0, "max_fps must be greater than or equal to 0"
         assert (
-            -1 <= lock_screen_orientation <= 3
+                -1 <= lock_screen_orientation <= 3
         ), "lock_screen_orientation must be LOCK_SCREEN_ORIENTATION_*"
         assert (
-            connection_timeout >= 0
+                connection_timeout >= 0
         ), "connection_timeout must be greater than or equal to 0"
         assert encoder_name in [
             None,
@@ -140,32 +140,38 @@ class Client:
         """
         Deploy server to android device
         """
-        jar_name = "scrcpy-server.jar"
+        # jar_name = "scrcpy-server.jar"
+        jar_name = "scrcpy-server-v2.1"
         server_file_path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)), jar_name
         )
         self.device.sync.push(server_file_path, f"/data/local/tmp/{jar_name}")
+        self.device.forward("tcp:5573", "localabstract:scrcpy")
         commands = [
             f"CLASSPATH=/data/local/tmp/{jar_name}",
             "app_process",
             "/",
             "com.genymobile.scrcpy.Server",
-            "1.20",  # Scrcpy server version
-            "info",  # Log level: info, verbose...
-            f"{self.max_width}",  # Max screen width (long side)
-            f"{self.bitrate}",  # Bitrate of video
-            f"{self.max_fps}",  # Max frame per second
-            f"{self.lock_screen_orientation}",  # Lock screen orientation: LOCK_SCREEN_ORIENTATION
-            "true",  # Tunnel forward
-            "-",  # Crop screen
-            "false",  # Send frame rate to client
-            "true",  # Control enabled
-            "0",  # Display id
-            "false",  # Show touches
-            "true" if self.stay_awake else "false",  # Stay awake
-            "-",  # Codec (video encoding) options
-            self.encoder_name or "-",  # Encoder name
-            "false",  # Power off screen after server closed
+            "2.1",  # Scrcpy server version
+            "log_level=debug",
+            "tunnel_forward=true",  # Tunnel forward
+            "audio=false",
+            "display_id=0",  # Display id
+            "control=true",  # Control enabled
+            "stay_awake=true",  # Stay awake
+            "cleanup=false",
+            f"video_bit_rate={self.bitrate}",  # Bitrate of video
+            f"max_fps={self.max_fps}",  # Max frame per second
+            f"max_size={self.max_width}",  # Max screen width (long side)
+            f"video_codec=h264",
+            f"send_frame_meta=false",
+            f"show_touches=false",
+            f"lock_video_orientation={self.lock_screen_orientation}",  # Lock screen orientation: LOCK_SCREEN_ORIENTATION
+            # "-",  # Crop screen
+            # "false",  # Send frame rate to client
+            # "-",  # Codec (video encoding) options
+            # self.encoder_name or "-",  # Encoder name
+            # "false",  # Power off screen after server closed
         ]
 
         self.__server_stream: AdbConnection = self.device.shell(

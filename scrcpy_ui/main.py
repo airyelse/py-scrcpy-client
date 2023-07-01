@@ -6,8 +6,9 @@ from PySide6.QtGui import QImage, QKeyEvent, QMouseEvent, QPixmap, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 import scrcpy
+import ui_main
 
-from .ui_main import Ui_MainWindow
+# from .ui_main import Ui_MainWindow
 
 if not QApplication.instance():
     app = QApplication([])
@@ -17,13 +18,13 @@ else:
 
 class MainWindow(QMainWindow):
     def __init__(
-        self,
-        max_width: Optional[int],
-        serial: Optional[str] = None,
-        encoder_name: Optional[str] = None,
+            self,
+            max_width: Optional[int],
+            serial: Optional[str] = None,
+            encoder_name: Optional[str] = None,
     ):
         super(MainWindow, self).__init__()
-        self.ui = Ui_MainWindow()
+        self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
         self.max_width = max_width
 
@@ -40,6 +41,8 @@ class MainWindow(QMainWindow):
             flip=self.ui.flip.isChecked(),
             bitrate=1000000000,
             encoder_name=encoder_name,
+            stay_awake=True,
+
         )
         self.client.add_listener(scrcpy.EVENT_INIT, self.on_init)
         self.client.add_listener(scrcpy.EVENT_FRAME, self.on_frame)

@@ -20,7 +20,7 @@
 
 This package allows you to view and control android device in realtime.
 
-![demo gif](https://raw.githubusercontent.com/leng-yue/py-scrcpy-client/main/demo.gif)  
+[//]: # (![demo gif]&#40;https://raw.githubusercontent.com/leng-yue/py-scrcpy-client/main/demo.gif&#41;  )
 
 Note: This gif is compressed and experience lower quality than actual.
 
@@ -28,6 +28,12 @@ Note: This gif is compressed and experience lower quality than actual.
 To begin with, you need to install this package via pip:
 ```shell
 pip install scrcpy-client[ui]
+```
+```shell
+poetry install
+```
+```shell
+poetry lock
 ```
 Then, you can start `py-scrcpy` to view the demo:
 
