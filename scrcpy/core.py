@@ -147,6 +147,7 @@ class Client:
         )
         self.device.sync.push(server_file_path, f"/data/local/tmp/{jar_name}")
         self.device.forward("tcp:5573", "localabstract:scrcpy")
+        # self.device.forward("tcp:5005", "tcp:5005")
         commands = [
             f"CLASSPATH=/data/local/tmp/{jar_name}",
             "app_process",
