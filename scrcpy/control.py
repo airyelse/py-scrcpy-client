@@ -21,8 +21,6 @@ def inject(control_type: int):
             package = struct.pack(">B", control_type) + f(*args, **kwargs)
             if args[0].parent.control_socket is not None:
                 with args[0].parent.control_socket_lock:
-                    # decimal_array = [ord(byte) for byte in package]
-                    print(package)
                     args[0].parent.control_socket.send(package)
             return package
 
@@ -37,7 +35,7 @@ class ControlSender:
 
     @inject(const.TYPE_INJECT_KEYCODE)
     def keycode(
-        self, keycode: int, action: int = const.ACTION_DOWN, repeat: int = 0
+            self, keycode: int, action: int = const.ACTION_DOWN, repeat: int = 0
     ) -> bytes:
         """
         Send keycode to device
@@ -63,7 +61,7 @@ class ControlSender:
 
     @inject(const.TYPE_INJECT_TOUCH_EVENT)
     def touch(
-        self, x: int, y: int, action: int = const.ACTION_DOWN, touch_id: int = -1
+            self, x: int, y: int, action: int = const.ACTION_DOWN, touch_id: int = -1, button: int = 0, buttons: int = 0
     ) -> bytes:
         """
         Touch screen
@@ -73,10 +71,12 @@ class ControlSender:
             y: vertical position
             action: ACTION_DOWN | ACTION_UP | ACTION_MOVE
             touch_id: Default using virtual id -1, you can specify it to emulate multi finger touch
+            button:
+            buttons:
         """
         x, y = max(x, 0), max(y, 0)
         return struct.pack(
-            ">BqiiHHHi",
+            ">BqiiHHHii",
             action,
             touch_id,
             int(x),
@@ -84,7 +84,8 @@ class ControlSender:
             int(self.parent.resolution[0]),
             int(self.parent.resolution[1]),
             0xFFFF,
-            1,
+            button,
+            buttons,
         )
 
     @inject(const.TYPE_INJECT_SCROLL_EVENT)
@@ -197,13 +198,13 @@ class ControlSender:
         return b""
 
     def swipe(
-        self,
-        start_x: int,
-        start_y: int,
-        end_x: int,
-        end_y: int,
-        move_step_length: int = 5,
-        move_steps_delay: float = 0.005,
+            self,
+            start_x: int,
+            start_y: int,
+            end_x: int,
+            end_y: int,
+            move_step_length: int = 5,
+            move_steps_delay: float = 0.005,
     ) -> None:
         """
         Swipe on screen

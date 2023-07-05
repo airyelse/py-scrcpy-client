@@ -102,7 +102,10 @@ class MainWindow(QMainWindow):
                 focused_widget.clearFocus()
             ratio = self.max_width / max(self.client.resolution)
             self.client.control.touch(
-                evt.position().x() / ratio, evt.position().y() / ratio, action
+                evt.position().x() / ratio, evt.position().y() / ratio,
+                action, evt.device().systemId(),
+                evt.button().value,
+                evt.buttons().value
             )
 
         return handler
