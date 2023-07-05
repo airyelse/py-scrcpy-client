@@ -21,6 +21,8 @@ def inject(control_type: int):
             package = struct.pack(">B", control_type) + f(*args, **kwargs)
             if args[0].parent.control_socket is not None:
                 with args[0].parent.control_socket_lock:
+                    # decimal_array = [ord(byte) for byte in package]
+                    print(package)
                     args[0].parent.control_socket.send(package)
             return package
 

@@ -141,16 +141,17 @@ class Client:
         Deploy server to android device
         """
         # jar_name = "scrcpy-server.jar"
-        jar_name = "scrcpy-server-v2.1"
+        jar_name = "scrcpy-server"
         server_file_path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)), jar_name
         )
-        self.device.sync.push(server_file_path, f"/data/local/tmp/{jar_name}")
-        self.device.forward("tcp:5573", "localabstract:scrcpy")
-        # self.device.forward("tcp:5005", "tcp:5005")
+        self.device.sync.push(server_file_path, f"/data/local/tmp/{jar_name}.jar")
+
         commands = [
-            f"CLASSPATH=/data/local/tmp/{jar_name}",
+            f"CLASSPATH=/data/local/tmp/{jar_name}.jar",
             "app_process",
+            "-XjdwpProvider:internal",
+            "-XjdwpOptions:transport=dt_socket,suspend=y,server=y,address=5005",
             "/",
             "com.genymobile.scrcpy.Server",
             "2.1",  # Scrcpy server version
@@ -179,6 +180,10 @@ class Client:
             commands,
             stream=True,
         )
+
+        print("forward...")
+        print(self.device.forward("tcp:5073", "localabstract:scrcpy"))
+        print(self.device.forward("tcp:5005", "tcp:5005"))
 
         # Wait for server to start
         self.__server_stream.read(10)
